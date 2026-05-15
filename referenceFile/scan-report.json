@@ -1,0 +1,235 @@
+{
+    "scan": {
+        "accountID": "UkMLG1oBSXKdz0imdMrHLQ",
+        "orgID": "default",
+        "projectID": "devdaytest1",
+        "uniqueId": "/test-scan-1778747446",
+        "name": "Validation Test Scan - 2026-05-14 14:00:46",
+        "description": "Automated validation test scan for Kubernetes security",
+        "tags": [
+            "validation",
+            "security",
+            "kubernetes",
+            "automated"
+        ],
+        "identity": "test-scan-1778747446",
+        "spec": {
+            "scanType": "kubernetes-security",
+            "sourceIdentity": {
+                "cluster": "validation-cluster",
+                "namespace": "default"
+            },
+            "status": "running"
+        }
+    },
+    "scannedRisks": [
+        {
+            "identity": "risk-0ca9dc36e3d80a62",
+            "name": "k8s-missing-resource-limits",
+            "description": "The nginx container has no CPU or memory limits. It can consume all available node resources, starving sibling pods.",
+            "tags": [
+                "kubernetes",
+                "reliability",
+                "nginx"
+            ],
+            "fingerprint": "k8s-missing-resource-limits::deployment/nginx::hce",
+            "severity": "High",
+            "status": "Open",
+            "metadata": {
+                "firstDetected": 1778754065197,
+                "impact": "Unbounded resource consumption causes noisy-neighbour failures on the node. Memory hog can trigger kernel OOM kills on sibling pods.",
+                "lastDetected": 1778754065197,
+                "occurrenceCount": 1,
+                "riskName": "k8s-missing-resource-limits",
+                "targetPrincipal": {
+                    "principalType": "Deployment",
+                    "identification": {
+                        "name": "nginx",
+                        "namespace": "hce"
+                    }
+                }
+            },
+            "occurrences": []
+        },
+        {
+            "identity": "risk-63585f719ae70293",
+            "name": "k8s-single-replica",
+            "description": "The nginx Deployment runs with replicas: 1, making it a single point of failure. A pod-delete fault causes 100% service unavailability until the pod restarts.",
+            "tags": [
+                "kubernetes",
+                "availability",
+                "nginx"
+            ],
+            "fingerprint": "k8s-single-replica::deployment/nginx::hce",
+            "severity": "High",
+            "status": "Open",
+            "metadata": {
+                "firstDetected": 1778753920381,
+                "impact": "Complete service downtime during any pod disruption, node maintenance, or OOM kill. No redundancy to absorb pod-level failures.",
+                "lastDetected": 1778753920381,
+                "occurrenceCount": 1,
+                "riskName": "k8s-single-replica",
+                "targetPrincipal": {
+                    "principalType": "Deployment",
+                    "identification": {
+                        "name": "nginx",
+                        "namespace": "hce"
+                    }
+                }
+            },
+            "occurrences": []
+        },
+        {
+            "identity": "risk-70047de688456a13",
+            "name": "k8s-missing-resource-requests",
+            "description": "The nginx container has no CPU or memory requests. It is assigned BestEffort QoS and will be the first pod evicted under any node pressure.",
+            "tags": [
+                "kubernetes",
+                "reliability",
+                "nginx"
+            ],
+            "fingerprint": "k8s-missing-resource-requests::deployment/nginx::hce",
+            "severity": "Medium",
+            "status": "Open",
+            "metadata": {
+                "firstDetected": 1778754145998,
+                "impact": "BestEffort QoS means nginx is evicted before any other pod on the node when memory or CPU pressure occurs — even if nginx itself is not causing the pressure.",
+                "lastDetected": 1778754145998,
+                "occurrenceCount": 1,
+                "riskName": "k8s-missing-resource-requests",
+                "targetPrincipal": {
+                    "principalType": "Deployment",
+                    "identification": {
+                        "name": "nginx",
+                        "namespace": "hce"
+                    }
+                }
+            },
+            "occurrences": []
+        },
+        {
+            "identity": "risk-9d1fb98116fb0571",
+            "name": "k8s-missing-probes",
+            "description": "The nginx container has no livenessProbe or readinessProbe. Kubernetes routes traffic to unhealthy pods and never restarts stuck ones.",
+            "tags": [
+                "kubernetes",
+                "availability",
+                "nginx"
+            ],
+            "fingerprint": "k8s-missing-probes::deployment/nginx::hce",
+            "severity": "High",
+            "status": "Open",
+            "metadata": {
+                "firstDetected": 1778754133507,
+                "impact": "Traffic is sent to pods that are restarting or deadlocked. Without livenessProbe, a hung nginx process is never restarted automatically.",
+                "lastDetected": 1778754133507,
+                "occurrenceCount": 1,
+                "riskName": "k8s-missing-probes",
+                "targetPrincipal": {
+                    "principalType": "Deployment",
+                    "identification": {
+                        "name": "nginx",
+                        "namespace": "hce"
+                    }
+                }
+            },
+            "occurrences": []
+        },
+        {
+            "identity": "risk-cc0dedba01f89142",
+            "name": "k8s-missing-network-policy",
+            "description": "The nginx Deployment has no NetworkPolicy. All ingress and egress traffic is unrestricted, enabling lateral movement from any compromised pod in the cluster to reach nginx directly.",
+            "tags": [
+                "kubernetes",
+                "security",
+                "network",
+                "nginx"
+            ],
+            "fingerprint": "k8s-missing-network-policy::deployment/nginx::hce",
+            "severity": "High",
+            "status": "Open",
+            "metadata": {
+                "firstDetected": 1778771672803,
+                "impact": "Any pod in any namespace can send traffic to nginx without restriction. A compromised workload can exfiltrate data, probe nginx endpoints, or use it as a pivot point for further lateral movement.",
+                "lastDetected": 1778771672803,
+                "occurrenceCount": 1,
+                "riskName": "k8s-missing-network-policy",
+                "targetPrincipal": {
+                    "principalType": "Deployment",
+                    "identification": {
+                        "name": "nginx",
+                        "namespace": "hce"
+                    }
+                }
+            },
+            "occurrences": []
+        },
+        {
+            "identity": "risk-cefd1e45886094da",
+            "name": "k8s-missing-pod-anti-affinity",
+            "description": "The nginx Deployment has no podAntiAffinity or topologySpreadConstraints. All replicas may be scheduled on the same node, turning the multi-replica deployment into a node-level single point of failure.",
+            "tags": [
+                "kubernetes",
+                "availability",
+                "nginx"
+            ],
+            "fingerprint": "k8s-missing-pod-anti-affinity::deployment/nginx::hce",
+            "severity": "Medium",
+            "status": "Open",
+            "metadata": {
+                "firstDetected": 1778754823011,
+                "impact": "Despite having replicas configured, all pods could land on the same node. A single node-drain or node-restart takes down every replica simultaneously — indistinguishable from a single-replica deployment at the node failure level.",
+                "lastDetected": 1778754823011,
+                "occurrenceCount": 1,
+                "riskName": "k8s-missing-pod-anti-affinity",
+                "targetPrincipal": {
+                    "principalType": "Deployment",
+                    "identification": {
+                        "name": "nginx",
+                        "namespace": "hce"
+                    }
+                }
+            },
+            "occurrences": []
+        },
+        {
+            "identity": "risk-e82478345a7fb026",
+            "name": "k8s-latest-image-tag",
+            "description": "The nginx container uses image 'nginx' with no tag. A pod restart may pull a different version from the registry, causing silent version drift between replicas.",
+            "tags": [
+                "kubernetes",
+                "reliability",
+                "nginx"
+            ],
+            "fingerprint": "k8s-latest-image-tag::deployment/nginx::hce",
+            "severity": "High",
+            "status": "Open",
+            "metadata": {
+                "firstDetected": 1778753990484,
+                "impact": "Non-deterministic deployments — two pods in the same Deployment can silently run different image versions after independent restarts.",
+                "lastDetected": 1778753990484,
+                "occurrenceCount": 1,
+                "riskName": "k8s-latest-image-tag",
+                "targetPrincipal": {
+                    "principalType": "Deployment",
+                    "identification": {
+                        "name": "nginx",
+                        "namespace": "hce"
+                    }
+                }
+            },
+            "occurrences": []
+        }
+    ],
+    "summary": {
+        "totalRisks": 7,
+        "totalOccurrences": 0,
+        "bySeverity": {
+            "High": 5,
+            "Medium": 2
+        },
+        "byStatus": {
+            "Open": 7
+        }
+    }
+}
